@@ -1,20 +1,107 @@
-import { TrendingUp, RefreshCw, Clock, Filter, ExternalLink } from 'lucide-react';
+"use client"
 
-let sources = ['all']
-let categories = ['all']
-let loading = false
+import { TrendingUp, RefreshCw, Clock, Filter, ExternalLink, AlertCircle } from 'lucide-react';
+import { useEffect, useState } from "react";
 
-
-let articles = [
-  { 'id': 'cdc54fa2404c78ffda9831d521592c3f', 'title': 'Accelerating AI Innovation with the AWS Cloud Adoption Framework', 'author': 'olawde', 'url': 'https://dev.to/aws-builders/accelerating-ai-innovation-with-the-aws-cloud-adoption-framework-28hk', 'source_id': '3177658', 'publish_date': '2026-01-16T20:33:16+00:00', 'source': 'DEVTO' },
-  { 'id': 'bd8e42b7e37e74ac96b634f426aa1256', 'title': 'I got tired of manual priority weights in proxies so I used a Reverse Radix Tree instead', 'author': 'robbiedobbie', 'url': 'https://getlode.app/blog/2026-01-25-stop-playing-priority-tetris', 'source_id': '1qmhw95', 'publish_date': '2026-01-25T12:30:56+00:00', 'source': 'REDDIT' },
-  { 'id': '3ed1413db8bb190933d4e5b99e04f506', 'title': 'Built a small cooking game to practice chaos-driven design', 'author': 'TerryC_IndieGameDev', 'url': 'https://introvertedgames.itch.io/kitchen-havoc', 'source_id': '1qmjsou', 'publish_date': '2026-01-25T13:58:34+00:00', 'source': 'REDDIT' },
-  { 'id': '8358c8b1a1740559de5b264763b39d79', 'title': 'Been following the metadata management space for work reasons and came across an interesting design problem that Apache Gravitino tried to solve in their 1.1 release.  \n\nThe problem: we have like 5+ different table formats now (Iceberg, Delta Lake, Hive, Hudi, now Lance for vectors) and each has its', 'author': 'Agitated_Fox2640', 'url': 'https://github.com/apache/gravitino/releases/tag/v1.1.0', 'source_id': '1qmkv8f', 'publish_date': '2026-01-25T14:42:31+00:00', 'source': 'REDDIT' },
-  { 'id': '6703a3a3ecbada679867a6ff8c2680b2', 'title': 'Do you have any strategy before applying to a job or internship?', 'author': 'davygamer18', 'url': 'https://github.com/webwithdev', 'source_id': '1qmkg0v', 'publish_date': '2026-01-25T14:25:18+00:00', 'source': 'REDDIT' }
-]
+const API_BASE_URL = 'http://localhost:8000/api';
 
 export default function Home() {
-  let lastUpdate = null
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(false)
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [autoRefresh, setAutoRefresh] = useState(true)
+  const [selectedSource, setSelectedSource] = useState('all');
+  const [sources, setSources] = useState(['all']);
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchArticles = async () => {
+    try {
+      setLoading(true);
+
+      const params = new URLSearchParams();
+      if (selectedSource != "all") {
+        params.append('source', selectedSource);
+      }
+
+      const response = await fetch(`${API_BASE_URL}/articles?${params}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      setArticles(data.articles);
+      setSources(["all", ...data.unique_sources]);
+      setLastUpdate(new Date(data.last_update));
+
+    } catch (err) {
+      setError('Failed to fetch articles. Make sure the FastAPI server is running on http://localhost:8000');
+      console.error('Fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleManualRefresh = async () => {
+    try {
+      // Trigger backend refresh
+      await fetch(`${API_BASE_URL}/refresh/trigger`, { method: 'POST' });
+
+      // Wait a bit for backend to process
+      setTimeout(() => {
+        fetchArticles();
+      }, 1000);
+    } catch (err) {
+      console.error('Error triggering refresh:', err);
+      fetchArticles(); // Fallback to regular fetch
+    }
+  };
+
+  const changeAutoRefresh = async (event) => {
+    const checked = event.target.checked;
+    console.log("Checked:", checked);
+    setAutoRefresh(checked)
+    if (checked) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/refresh/enable`, { method: 'POST' });
+        const data = await response.json();
+
+        console.log(data)
+      } catch (err) {
+        console.error('Error enabling refresh:', err);
+      }
+    } else {
+      try {
+        const response = await fetch(`${API_BASE_URL}/refresh/disable`, { method: 'POST' });
+        const data = await response.json();
+
+        console.log(data)
+      } catch (err) {
+        console.error('Error enabling refresh:', err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+
+  useEffect(() => {
+    if (!loading) {
+      fetchArticles();
+    }
+  }, [selectedSource]);
+
+  const formatTimeAgo = (date) => {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="max-w-7xl mx-auto p-6">
@@ -27,9 +114,11 @@ export default function Home() {
               </h1>
             </div>
             <button
+              onClick={handleManualRefresh}
+              disabled={loading}
               className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <RefreshCw className={`w-4 h-4`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </button>
           </div>
@@ -44,6 +133,8 @@ export default function Home() {
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
+                checked={autoRefresh}
+                onChange={changeAutoRefresh}
                 className="w-4 h-4"
               />
               Auto-refresh (60s)
@@ -59,7 +150,11 @@ export default function Home() {
           <div className="flex flex-wrap gap-4">
             <div>
               <label className="block text-sm text-slate-600 mb-1">Source</label>
-              <select className="border border-slate-300 rounded px-3 py-1.5 text-sm text-slate-600">
+              <select
+                value={selectedSource}
+                onChange={(e) => setSelectedSource(e.target.value)}
+                className="border border-slate-300 rounded px-3 py-1.5 text-sm text-slate-600"
+              >
                 {sources.map(source => (
                   <option key={source} value={source}>
                     {source === 'all' ? 'All Sources' : source}
@@ -67,20 +162,19 @@ export default function Home() {
                 ))}
               </select>
             </div>
-            <div>
-              <label className="block text-sm text-slate-600 mb-1">Category</label>
-              <select className="border border-slate-300 rounded px-3 py-1.5 text-slate-600 text-sm">
-                {categories.map(cat => (
-                  <option key={cat} value={cat}>
-                    {cat === 'all' ? 'All Categories' : cat}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
         </div>
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3 text-red-800">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <div>
+              <div className="font-semibold mb-1">Connection Error</div>
+              <div className="text-sm">{error}</div>
+              <div className="text-xs mt-2">Run: <code className="bg-red-100 px-1 rounded">python main.py</code></div>
+            </div>
+          </div>
+        )}
 
-        {/* Articles Grid */}
         {loading && articles.length === 0 ? (
           <div className="text-center py-12">
             <RefreshCw className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
@@ -100,7 +194,7 @@ export default function Home() {
                         {article.source}
                       </span>
                       <span className="text-xs text-slate-500">
-                        {article.publish_date}
+                        {formatTimeAgo(article.publish_date)}
                       </span>
                     </div>
 
