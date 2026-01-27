@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Article } from '../types/article';
 import { articlesApi } from '../lib/api';
 
-const AUTO_REFRESH_INTERVAL = 900_000 //15 mins
+const AUTO_REFRESH_INTERVAL = 900_000; //15 mins
 
 export function useArticles(selectedSource: string) {
     const [articles, setArticles] = useState<Article[]>([]);
@@ -28,7 +28,7 @@ export function useArticles(selectedSource: string) {
             setLastUpdate(new Date());
         } catch (err) {
             setError(
-                'Failed to fetch articles. Make sure the FastAPI server is running on http://localhost:8000'
+                'Failed to fetch articles. Make sure the FastAPI server is running.'
             );
             console.error('Fetch error:', err);
         } finally {

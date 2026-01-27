@@ -11,9 +11,6 @@ export function ErrorAlert({ error }: ErrorAlertProps) {
             <div>
                 <div className="font-semibold mb-1">Connection Error</div>
                 <div className="text-sm">{error}</div>
-                <div className="text-xs mt-2">
-                    Run: <code className="bg-red-100 px-1 rounded">python main.py</code>
-                </div>
             </div>
         </div>
     );
