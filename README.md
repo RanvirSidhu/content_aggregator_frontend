@@ -1,11 +1,52 @@
-Currently Deployed: https://content-aggregator-frontend.vercel.app/
+# 📰 Tech News Aggregator - Frontend
 
+A modern, responsive Next.js application for browsing aggregated tech news from multiple sources with real-time updates and filtering capabilities.
+Deployed using vercel: https://content-aggregator-frontend.vercel.app/
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Features
 
-## Getting Started
+- **Real-time Updates** - Display articles from FastAPI backend
+- **Source Filtering** - Filter articles by source (Dev.to, Reddit, Lobsters)
+- **Manual Refresh** - Trigger on-demand article updates
+- **Auto-refresh Toggle** - Enable/disable automatic background refresh
 
-First, run the development server:
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js 18+** or **Bun 1.0+**
+- **npm**, **yarn**, **pnpm**, or **bun**
+
+### Installation
+
+1. **Clone the repository** (or navigate to frontend directory)
+
+```bash
+cd content_aggregator_frontend
+```
+
+2. **Install dependencies**
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+```
+
+3. **Configure API URL**
+
+Update the API base URL in `lib/api.ts`:
+
+```typescript
+const API_BASE_URL = 'http://localhost:8000/api';
+// For production: 'https://api.yourdomain.com/api'
+```
+
+4. **Run the development server**
 
 ```bash
 npm run dev
@@ -17,23 +58,60 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. **Open your browser**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Navigate to [http://localhost:3000](http://localhost:3000)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔌 API Layer
 
-## Learn More
+### `lib/api.ts`
+**API Client Functions**
+**Functions:**
 
-To learn more about Next.js, take a look at the following resources:
+```typescript
+articlesApi.fetchArticles(source?: string)
+// GET /api/articles?source={source}
+// Returns: ArticlesResponse
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+articlesApi.triggerRefresh()
+// POST /api/refresh/trigger
+// Returns: void
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+articlesApi.enableAutoRefresh()
+// POST /api/refresh/enable
+// Returns: void
 
-## Deploy on Vercel
+articlesApi.disableAutoRefresh()
+// POST /api/refresh/disable
+// Returns: void
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🎨 Styling
+
+### Tailwind CSS
+
+This project uses **Tailwind CSS** for styling with a utility-first approach.
+---
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create `.env.local` for environment-specific configuration:
+
+```bash
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
+```
+
+
+
+
+
+
+
+
+
+
