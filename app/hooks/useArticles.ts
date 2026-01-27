@@ -79,7 +79,7 @@ export function useArticles(selectedSource: string) {
 
     useEffect(() => {
         fetchArticles();
-    }, []);
+    }, [fetchArticles]);
 
     return {
         articles,
