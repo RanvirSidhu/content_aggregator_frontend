@@ -4,13 +4,14 @@ import { articlesApi } from '../lib/api';
 
 const AUTO_REFRESH_INTERVAL = 900_000; //15 mins
 
-export function useArticles(selectedSource: string) {
+export function useArticles(selectedSource: string, pageNumber: number, searchTitle: string | null) {
     const [articles, setArticles] = useState<Article[]>([]);
     const [sources, setSources] = useState<string[]>(['all']);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
     const [autoRefresh, setAutoRefresh] = useState(true);
+    const [totalEntries, setTotalEntries] = useState(0);
 
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -20,12 +21,13 @@ export function useArticles(selectedSource: string) {
             setError(null);
 
             const data = await articlesApi.fetchArticles(
-                selectedSource !== 'all' ? selectedSource : undefined
+                selectedSource !== 'all' ? selectedSource : undefined, pageNumber, searchTitle
             );
 
             setArticles(data.articles);
             setSources(['all', ...data.unique_sources]);
             setLastUpdate(new Date());
+            setTotalEntries(data.total_entries)
         } catch (err) {
             setError(
                 'Failed to fetch articles. Make sure the FastAPI server is running.'
@@ -34,7 +36,7 @@ export function useArticles(selectedSource: string) {
         } finally {
             setLoading(false);
         }
-    }, [selectedSource]);
+    }, [selectedSource, pageNumber, searchTitle]);
 
     const refresh = useCallback(async () => {
         try {
@@ -87,6 +89,7 @@ export function useArticles(selectedSource: string) {
         loading,
         error,
         lastUpdate,
+        totalEntries,
         autoRefresh,
         toggleAutoRefresh,
         refresh,

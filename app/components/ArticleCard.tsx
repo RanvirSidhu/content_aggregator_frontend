@@ -21,7 +21,7 @@ function truncateTitle(title: string, maxLength: number = 100): string {
 
 export function ArticleCard({ article }: ArticleCardProps) {
     return (
-        <article className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-5">
+        <article className="bg-gradient-to-br from-slate-100 to-slate-100 rounded-lg border-4 shadow-md hover:shadow-xl transition-shadow p-5">
             <div className="flex justify-between items-start gap-4">
                 <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">

@@ -11,5 +11,5 @@ export interface Article {
 export interface ArticlesResponse {
     articles: Article[];
     unique_sources: string[];
-    last_update: string;
+    total_entries: number;
 }

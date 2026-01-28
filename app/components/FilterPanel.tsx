@@ -3,13 +3,17 @@ import { Filter } from 'lucide-react';
 interface FilterPanelProps {
     sources: string[];
     selectedSource: string;
+    placeholder: string;
     onSourceChange: (source: string) => void;
+    onSearchChange: (e: string) => void;
 }
 
 export function FilterPanel({
     sources,
     selectedSource,
+    placeholder,
     onSourceChange,
+    onSearchChange,
 }: FilterPanelProps) {
     return (
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
@@ -33,6 +37,10 @@ export function FilterPanel({
                         ))}
                     </select>
                 </div>
+                <form>
+                    <label className='block text-sm text-slate-600 mb-1'>Search</label>
+                    <input type='text' className='border border-slate-300 rounded px-3 py-1 text-sm text-slate-600' placeholder={placeholder} onChange={(e) => { onSearchChange(e.target.value) }} />
+                </form>
             </div>
         </div>
     );
