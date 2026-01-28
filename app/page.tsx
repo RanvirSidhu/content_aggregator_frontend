@@ -21,7 +21,7 @@ export default function Home() {
 
   const [selectedSource, setSelectedSource] = useState(urlSource ? urlSource : "all");
   const [currentPage, setPageChange] = useState(urlPageNo ? +urlPageNo : 1);
-  const [searchTitle, setSearchTitle] = useState<string | null>(urlSearchTitle ? urlSearchTitle : null);
+  const [searchTitle, setSearchTitle] = useState<string | undefined>(urlSearchTitle ? urlSearchTitle : undefined);
 
   const {
     articles,

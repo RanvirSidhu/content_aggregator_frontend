@@ -4,7 +4,7 @@ import { articlesApi } from '../lib/api';
 
 const AUTO_REFRESH_INTERVAL = 900_000; //15 mins
 
-export function useArticles(selectedSource: string, pageNumber: number, searchTitle: string | null) {
+export function useArticles(selectedSource: string, pageNumber: number, searchTitle: string | undefined) {
     const [articles, setArticles] = useState<Article[]>([]);
     const [sources, setSources] = useState<string[]>(['all']);
     const [loading, setLoading] = useState(false);
