@@ -3,7 +3,7 @@ import { Filter } from 'lucide-react';
 interface FilterPanelProps {
     sources: string[];
     selectedSource: string;
-    placeholder: string;
+    placeholder: string | null;
     onSourceChange: (source: string) => void;
     onSearchChange: (e: string) => void;
 }

@@ -15,12 +15,12 @@ export default function Home() {
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  const urlPageNo = searchParams.get("page") ? parseInt(searchParams.get("page")) : 0;
+  const urlPageNo = searchParams.get("page");
   const urlSource = searchParams.get("source");
   const urlSearchTitle = searchParams.get("search_title");
 
   const [selectedSource, setSelectedSource] = useState(urlSource ? urlSource : "all");
-  const [currentPage, setPageChange] = useState(urlPageNo == 0 ? urlPageNo + 1 : urlPageNo);
+  const [currentPage, setPageChange] = useState(urlPageNo ? +urlPageNo : 1);
   const [searchTitle, setSearchTitle] = useState<string | null>(urlSearchTitle ? urlSearchTitle : null);
 
   const {
